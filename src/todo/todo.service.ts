@@ -3,14 +3,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { TodoDocument, Todo } from './schemas/todo.schema';
 
-const TodoArray: TodoDocument[] = [];
+
 
 @Injectable()
 export class TodoService {
   constructor(@InjectModel(Todo.name) private TodoModel: Model<TodoDocument>) {}
 
   create(createTodoDto: Omit<TodoDocument, '_id'>): Promise<TodoDocument> {
-    TodoArray.push(createTodoDto);
     const TodoToSave = new this.TodoModel({
       description: createTodoDto.description,
       isCompleted: createTodoDto.isCompleted,
