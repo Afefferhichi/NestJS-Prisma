@@ -1,40 +1,44 @@
 import { Injectable } from '@nestjs/common';
-import { CreateTodoDto } from './dto/create-todo.dto';
-import { UpdateTodoDto } from './dto/update-todo.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { TodoDocument, Todo } from './schemas/todo.schema';
 
-const Todo: CreateTodoDto[] = []
+const TodoArray: TodoDocument[] = [];
 
 @Injectable()
 export class TodoService {
-  create(createTodoDto: CreateTodoDto): CreateTodoDto {
-    Todo.push(createTodoDto)
-    return createTodoDto;
-  }
+  constructor(@InjectModel(Todo.name) private TodoModel: Model<TodoDocument>) {}
 
-  findAll(): CreateTodoDto[] {
-    return Todo;
-  }
-
-  findOne(id: number): CreateTodoDto { // define return type of findOne
-    return Todo.find(singleTodo => id === singleTodo.id);
-  }
-
-  update(id: number, updateTodoDto: UpdateTodoDto): CreateTodoDto {
-    let singleTodoS: CreateTodoDto;
-    Todo.map(singleTodo => {
-      if (id == singleTodo.id) {
-        console.log({ singleTodo,updateTodoDto })
-        singleTodo.description = updateTodoDto.description
-        singleTodo.isCompleted = updateTodoDto.isCompleted
-        singleTodoS = singleTodo
-      }
+  create(createTodoDto: Omit<TodoDocument, '_id'>): Promise<TodoDocument> {
+    TodoArray.push(createTodoDto);
+    const TodoToSave = new this.TodoModel({
+      description: createTodoDto.description,
+      isCompleted: createTodoDto.isCompleted,
     });
-    return singleTodoS;
+    return TodoToSave.save();
   }
 
-  remove(id: number) {
-    const indexOfTodo = Todo.findIndex((singleTodo) => singleTodo.id == id)
-    Todo.splice(indexOfTodo,1)
-    return `Item with Id #${id} deleted`
+  async findAll(): Promise<TodoDocument[]> {
+    return this.TodoModel.find();
+  }
+
+  async findOne(_id: string): Promise<TodoDocument> {
+    // define return type of findOne
+    return this.TodoModel.findOne({ _id });
+  }
+
+  async update(
+    _id: string,
+    updateTodoDto: TodoDocument,
+  ): Promise<TodoDocument> {
+    return this.TodoModel.findOneAndUpdate(
+      { _id },
+      { $set: updateTodoDto },
+      { new: true },
+    );
+  }
+
+  async remove(_id: string): Promise<TodoDocument> {
+    return this.TodoModel.findOneAndDelete({_id });
   }
 }

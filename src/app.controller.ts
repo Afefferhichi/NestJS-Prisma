@@ -1,20 +1,19 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 
-@Controller() 
+@Controller()
 export class MyController {
-  @Get ()
+  @Get()
   getHelloGorgeousPeople() {
-    return "Hello Gorgeous People!";
+    return 'Hello Gorgeous People!';
   }
 
-  @Get ('/amazing')
+  @Get('/amazing')
   getHelloAmazingPeople() {
-    return "Hello Amazing People!";
+    return 'Hello Amazing People!';
   }
 
   @Post('/amazing')
-  createamazingpeople(@Body() req){
-    return `New person add ${req.name}`
+  createamazingpeople(@Body() req) {
+    return `New person add ${req.name}`;
   }
 }
-
