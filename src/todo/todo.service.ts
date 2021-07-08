@@ -3,8 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { TodoDocument, Todo } from './schemas/todo.schema';
 
-
-
 @Injectable()
 export class TodoService {
   constructor(@InjectModel(Todo.name) private TodoModel: Model<TodoDocument>) {}
@@ -38,6 +36,6 @@ export class TodoService {
   }
 
   async remove(_id: string): Promise<TodoDocument> {
-    return this.TodoModel.findOneAndDelete({_id });
+    return this.TodoModel.findOneAndDelete({ _id });
   }
 }
