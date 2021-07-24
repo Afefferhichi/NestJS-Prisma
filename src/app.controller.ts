@@ -1,7 +1,12 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Controller, Get, Body, Post, Request, UseGuards } from '@nestjs/common';
+import { AuthService } from './auth/auth.service';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { LocalAuthGuard } from './auth/guards/local-auth.guard';
 
 @Controller()
-export class MyController {
+export class AppController {
+  constructor(private readonly authService: AuthService) {}
+
   @Get()
   getHelloGorgeousPeople() {
     return 'Hello Gorgeous People!';
@@ -16,4 +21,16 @@ export class MyController {
   createamazingpeople(@Body() req) {
     return `New person add ${req.name}`;
   }
+  @UseGuards(LocalAuthGuard)
+  @Post('auth/login')
+  async login(@Request() req) {
+    return this.authService.login(req.user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  getProfile(@Request() req) {
+    return req.user;
+  }
 }
+
